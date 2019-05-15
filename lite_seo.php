@@ -1,11 +1,11 @@
 <?php
 /*
-Plugin Name: lite_seo
+Plugin Name: Lite-SEO
 Plugin URI: https://github.com/avdeevalexsey/wp_lite_seo
 Description: This plugin adds SEO headers to your website (Title, Keywords, Description). Editable fields will appear for posts, pages, tags and categories. The plugin is implemented as minimalist as possible and does not require a large amount of resources.
 Version: 1.0
 Author: Alexey Avdeev
-Author URI: https://github.com/avdeevalexsey
+Author URI: https://profiles.wordpress.org/avdeevalexsey/
 */
 
 add_action( 'admin_init', 'lite_seo_init');
