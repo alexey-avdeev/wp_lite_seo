@@ -4,6 +4,7 @@ This plugin adds SEO headers to your website (Title, Keywords, Description). Edi
 # How to get field value?
 
 *For posts and pages*
+
 *$id - post or page id*
 
 **get_post_meta($id, 'lite_seo_title', 1);** *// Title*
@@ -13,6 +14,7 @@ This plugin adds SEO headers to your website (Title, Keywords, Description). Edi
 **get_post_meta($id, 'lite_seo_description', 1);** *// Description*
 
 *For categories and tags*
+
 *$id - category or tag id*
 
 **get_term_meta($id,'lite_seo_title',1);** *// Title*
