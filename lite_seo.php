@@ -42,7 +42,7 @@ function lite_seo_fields_box( $post ){
 function lite_seo_fields_update( $post_id ){
 
 
-
+        if (!is_int($post_id)) return false;
         if (!isset($_POST['lite_seo_fields_nonce']) || !wp_verify_nonce($_POST['lite_seo_fields_nonce'], 'Df#FcdSf34Dfs')) return false;
         if (defined('DOING_AUTOSAVE') && DOING_AUTOSAVE) return false;
         if (!current_user_can('edit_post', $post_id)) return false;
@@ -52,12 +52,17 @@ function lite_seo_fields_update( $post_id ){
 
         $_POST['lite_seo'] = array_map('trim', $_POST['lite_seo']);
         foreach ($_POST['lite_seo'] as $key => $value) {
+
+            if (!in_array($key,array('lite_seo_title','lite_seo_keywords','lite_seo_description'))) {
+                continue;
+            }
+
             if (empty($value)) {
                 delete_post_meta($post_id, $key);
                 continue;
             }
 
-            update_post_meta($post_id, $key, $value);
+            update_post_meta($post_id, $key, sanitize_text_field($value));
         }
         return $post_id;
 
@@ -80,16 +85,22 @@ function lite_seo_show_form_fileds_taxonomy($taxonomy) {
 
 function lite_seo_save_taxonomy_meta($term_id) {
 
+    if (!is_int($term_id)) return false;
     if (!isset($_POST['lite_seo_fields_nonce']) || !wp_verify_nonce($_POST['lite_seo_fields_nonce'], 'Df#FcdSf34Dfs')) return false;
-    if ( ! current_user_can('edit_term', $term_id) ) return;
+    if ( ! current_user_can('edit_term', $term_id) ) return false;
     if (!isset($_POST['lite_seo'])) return false;
 
     $_POST['lite_seo'] = array_map('trim', $_POST['lite_seo']);
     foreach ($_POST['lite_seo'] as $key => $value) {
+
+        if (!in_array($key,array('lite_seo_title','lite_seo_keywords','lite_seo_description'))) {
+            continue;
+        }
+
         if(!$value)
             delete_term_meta( $term_id, $key );
         else
-            update_term_meta( $term_id, $key, $value);
+            update_term_meta( $term_id, $key, sanitize_text_field($value));
 
       }
 
