@@ -2,7 +2,7 @@
 /*
 Plugin Name: Lite-SEO
 Plugin URI: https://github.com/avdeevalexsey/wp_lite_seo
-Description: This plugin adds SEO headers to your website (Title, Keywords, Description). Editable fields will appear for posts, pages, tags and categories. The plugin is implemented as minimalist as possible and does not require a large amount of resources.
+Description: This plugin adds SEO headers to your website (Title, Keywords, Description). Editable fields will appear for posts, pages, tags, categories, attachment and custom post types, custom taxonomy. The plugin is implemented as minimalist as possible and does not require a large amount of resources.
 Version: 1.0
 Author: Alexey Avdeev
 Author URI: https://profiles.wordpress.org/avdeevalexsey/
@@ -13,6 +13,8 @@ add_action( 'admin_init', 'lite_seo_init');
 function lite_seo_init(){
     add_action('add_meta_boxes', 'lite_seo_fields', 1);
     add_action('save_post', 'lite_seo_fields_update', 0);
+    add_action('edit_attachment', 'lite_seo_fields_update', 0);
+
 
     add_action( 'category_edit_form_fields', 'lite_seo_show_form_fileds_taxonomy', 10, 2);
     add_action( 'post_tag_edit_form_fields', 'lite_seo_show_form_fileds_taxonomy', 10, 2);
@@ -24,13 +26,33 @@ function lite_seo_init(){
 
     add_action("create_post_tag", 'lite_seo_save_taxonomy_meta');
     add_action("edited_post_tag", 'lite_seo_save_taxonomy_meta');
+
+
+    $castom_taxonomy = get_taxonomies(array('public' =>'true','_builtin' => false));
+
+    if (!empty($castom_taxonomy)){
+        foreach ($castom_taxonomy as $taxonomy){
+            add_action( $taxonomy.'_edit_form_fields', 'lite_seo_show_form_fileds_taxonomy', 10, 2);
+            add_action( $taxonomy.'_add_form_fields',  'lite_seo_show_form_fileds_taxonomy', 10, 2);
+            add_action("create_".$taxonomy, 'lite_seo_save_taxonomy_meta');
+            add_action("edited_".$taxonomy, 'lite_seo_save_taxonomy_meta');
+        }
+    }
 }
 
 
 // Posts' meta box
 
-function lite_seo_fields() {
-    add_meta_box( 'lite_seo_fields', 'SEO', 'lite_seo_fields_box', array('post','page'), 'normal', 'high'  );
+function lite_seo_fields()
+{
+    $post_types = get_post_types(array('public'=>true));
+
+
+    if (!empty($post_types)) {
+
+        add_meta_box('lite_seo_fields', 'SEO', 'lite_seo_fields_box', $post_types, 'normal', 'high');
+
+    }
 }
 
 function lite_seo_fields_box( $post ){
@@ -122,7 +144,7 @@ function lite_seo_return($title, $sep, $seplocation) {
         }
     }
 
-    if (is_category() OR is_tag()){
+    if (is_category() OR is_tag() OR is_tax()){
         $taxonomy_title = get_term_meta(get_queried_object()->term_id,'lite_seo_title',1);
         if (!empty($taxonomy_title)){
             return $taxonomy_title;
@@ -151,7 +173,7 @@ function wp_head_lite_seo() {
 
     }
 
-    elseif (is_category() OR is_tag()){
+    elseif (is_category() OR is_tag() OR is_tax()){
 
         $taxonomy_keywords = get_term_meta(get_queried_object()->term_id,'lite_seo_keywords',1);
         if (!empty($taxonomy_keywords)){
